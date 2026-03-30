@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #ffb6c1;
+  --color-secondary: #ff69b4;
+  --color-bg-dark: #2a111a;
+  --color-card-bg: rgba(255, 255, 255, 0.1);
+  --font-dancing: "Dancing Script", cursive;
+  --font-outfit: "Outfit", sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg-dark);
+    color: white;
+    font-family: var(--font-outfit);
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+  }
+  .card-shadow {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  .card-shadow-hover {
+    box-shadow: 0 15px 40px rgba(255, 182, 193, 0.3);
+  }
+  .animate-bounce-in {
+    animation: bounceIn 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+  }
+  .animate-fade-in {
+    animation: fadeIn 2s ease-in both;
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out both;
+  }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale3d(0.3, 0.3, 0.3); opacity: 0; }
+  20% { transform: scale3d(1.1, 1.1, 1.1); }
+  40% { transform: scale3d(0.9, 0.9, 0.9); }
+  60% { transform: scale3d(1.03, 1.03, 1.03); opacity: 1; }
+  80% { transform: scale3d(0.97, 0.97, 0.97); }
+  100% { transform: scale3d(1, 1, 1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
