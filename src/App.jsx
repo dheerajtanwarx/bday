@@ -173,7 +173,7 @@ const AudioVisualizer = ({ audioRef, isPlaying }) => {
 const cards = [
   {
     id: 1,
-    title: 'You are a Star 🌟',
+    title: 'Khud jaisa hona hi kaafi hai',
     desc: 'May your day be as beautiful and adorable as you! Hold onto all the happiness the world has to offer.',
     img: '/images/img2.jpg'
   },
