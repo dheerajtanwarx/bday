@@ -65,37 +65,14 @@ const PulsatingRings = () => (
 );
 
 // Real-time audio visualizer using Web Audio API rendered on a canvas
-const AudioVisualizer = ({ audioRef, isPlaying }) => {
+const AudioVisualizer = ({ analyser, isPlaying }) => {
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
-  const analyserRef = useRef(null);
-  const sourceRef = useRef(null);
-  const contextRef = useRef(null);
 
   useEffect(() => {
-    if (!audioRef?.current) return;
-
-    // Bootstrap the Web Audio API context once
-    if (!contextRef.current) {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = ctx.createAnalyser();
-        analyser.fftSize = 64;
-        const source = ctx.createMediaElementSource(audioRef.current);
-        source.connect(analyser);
-        analyser.connect(ctx.destination);
-        contextRef.current = ctx;
-        analyserRef.current = analyser;
-        sourceRef.current = source;
-      } catch (e) {
-        console.warn('AudioContext setup failed:', e);
-      }
-    }
-
     const canvas = canvasRef.current;
-    if (!canvas || !analyserRef.current) return;
+    if (!canvas || !analyser) return;
 
-    const analyser = analyserRef.current;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     const ctx2d = canvas.getContext('2d');
@@ -138,9 +115,6 @@ const AudioVisualizer = ({ audioRef, isPlaying }) => {
     };
 
     if (isPlaying) {
-      if (contextRef.current?.state === 'suspended') {
-        contextRef.current.resume();
-      }
       draw();
     } else {
       cancelAnimationFrame(animFrameRef.current);
@@ -158,7 +132,7 @@ const AudioVisualizer = ({ audioRef, isPlaying }) => {
     }
 
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, [isPlaying, audioRef]);
+  }, [isPlaying, analyser]);
 
   return (
     <canvas
@@ -174,19 +148,23 @@ const cards = [
   {
     id: 1,
     title: 'Khud jaisa hona hi kaafi hai',
-    desc: 'May your day be as beautiful and adorable as you! Hold onto all the happiness the world has to offer.',
+    desc: `तुम मुझे बेवजह पसंद आने वाली पसंद बनना,
+सुना है बेवजह पसंद आई हुई चीज़ों के साथ रिश्ता ज़्यादा लंबा चलता है।
+क्योंकि वजह से पसंद की गई चीज़ों में,
+वजह ख़त्म होने के बाद सब कुछ भी ख़त्म सा होने लगता है। ❤️`,
     img: '/images/img2.jpg'
   },
   {
     id: 2,
     title: 'Make a Wish 🎂',
-    desc: 'Puff! Blow out the candles and let all your dreams take flight. This year is yours to conquer!',
+    desc: `कुछ अधूरी ख़्वाहिशें भी ख़ूबसूरत होती हैं,
+ये मैंने तुमसे मिलकर जाना। ✨`,
     img: '/images/img4.jpg'
   },
   {
     id: 3,
     title: 'Magical Times ✨',
-    desc: 'May your life overflow with magical moments, surprises, and endless love!',
+    desc: 'दिल ठहर सा गया।',
     img: '/images/img5.webp'
   }
 ];
@@ -194,31 +172,85 @@ const cards = [
 const galleryItems = [
   {
     id: 1,
-    title: 'Memories',
+    title: 'Khubsurat Ehsaas',
     src: '/enna sona.mp3',
     img: '/images/img6.jpg',
-    poetry: "Like a gentle breeze on a summer's day,\nYour smile chases all the clouds away.\nEvery moment spent with you is art,\nForever etched deeply in my heart."
+    poetry: `सुन अच्छा लगता है  
+तेरे साये का मेरे करीब रहना ......
+अच्छा लगता है....
+तेरे होठों का बेवजह हंसना ......
+अच्छा लगता है.....
+तेरे हाथों का बदमाशियाँ करना ......
+अच्छा लगता है.....
+मेरे दिल को तेरे छू कर चले जाना ......
+अच्छा लगता है......
+जब हवाएं अकेलेपन में करवाती है एहसास तेरा...
+अच्छा लगता है......
+बारिश में तुझे याद कर भीगना ......
+अच्छा लगता है......
+तेरा मेरी रूह को छू जाना ...
+अच्छा लगता है.....
+तेरी नजरों का शरारतियाँ करना ......
+सुन अच्छा लगता है.....
+तुझसे Dosti करना.........
+`
   },
   {
     id: 2,
-    title: 'Celebration',
+    title: 'Tere Naina',
     src: '/TereNainaLyrical.mp3',
     img: '/images/img7.jpg',
-    poetry: "Candles glow and wishes fly so high,\nSparkling brighter than the starry sky.\nMay this day bring joy that never ends,\nSurrounded by your family and friends."
+    poetry: `तुम्हारा और मेरा एक “बेनाम रिश्ता”…
+ना जिसे कभी पा सके,
+और ना ही जिसे पूरी तरह खो सके।
+रह गए अधूरे से बनकर कहीं।
+ना तुम हमें समझ सके,
+ना हम तुम्हें समझा पाए।
+मिल तो न पाए…
+लेकिन फिर भी लगते हो करीब से।
+ज़रूरी नहीं…
+लेकिन फिर भी लगते हो ज़रूरी से।
+ना जाने क्या और कैसा…
+तुम्हारा और मेरा ये “बेनाम रिश्ता”।`
   },
   {
     id: 3,
-    title: 'Magic',
-    src: '/Tu Aisa Kaise.mp3',
+    title: 'Ye Teri Hasi',
+    src: '/Bairiya.mp3',
     img: '/images/img10.jpeg',
-    poetry: "A pinch of stardust, a touch of grace,\nA magical aura fills this place.\nThe universe aligned to let you shine,\nA destiny so beautiful and fine."
+    poetry: `जिंदगी की इस राह पर… किसी ने पूछा…
+कि तुम रहते कहाँ हो…
+
+मैंने कहा…
+
+खुले आसमान से जमीन तक बहते हुए दरिया के बीच
+एक जगह है…
+वहाँ घर है मेरा…
+
+हकीकत और सपनों के बीच…
+एक छोटा सा गाँव है
+वहाँ घर है मेरा…
+
+जिंदगी की खुशियों और ग़मों के बीच…
+एक ठिकाना है
+वहाँ घर है मेरा…
+
+मेरे और मेरे सपनों की दुनिया के बीच…
+एक धुंधली सी राह है…
+वहाँ घर है मेरा…`
   },
   {
     id: 4,
     title: 'Forever',
     src: '/Pehli_Dafa_Song.mp3',
     img: '/images/img9.jpeg',
-    poetry: "Through seasons changing and pages turned,\nThe brightest lessons I have ever learned.\nTogether we walk this ongoing mile,\nAlways finding heaven in your smile."
+    poetry: `कोई किसी को छोटी उंगली जितना भर भी सही से छू ले, तो सब कुछ कितना आसान हो जाए।
+छूना जब केवल छूने के लिए हो,
+कहीं पहुँचने के लिए नहीं।
+जब शरीर एक-दूसरे पर चढ़ाई करने के लिए नहीं,
+बल्कि एक-दूसरे की धूल साफ करने के लिए हाथ बढ़ाएँ।
+मैं हमेशा यही चाहूँ,
+कि हम भी एक-दूसरे की वही उंगली बनें।`
   }
 ];
 
@@ -232,10 +264,29 @@ function App() {
   const [showSecret, setShowSecret] = useState(false); // stores the Easter egg visibility
 
   const audioRef = useRef(null);
+  const [analyser, setAnalyser] = useState(null);
+  const audioContextRef = useRef(null);
   const bufferRef = useRef(""); // stores keystrokes for the easter egg
+
+  const initAudioAPI = () => {
+    if (!audioRef.current || analyser) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ans = ctx.createAnalyser();
+      ans.fftSize = 64;
+      const source = ctx.createMediaElementSource(audioRef.current);
+      source.connect(ans);
+      ans.connect(ctx.destination);
+      audioContextRef.current = ctx;
+      setAnalyser(ans);
+    } catch (e) {
+      console.warn("AudioContext setup failed:", e);
+    }
+  };
 
   const handleOpenGift = () => {
     setIsOpened(true);
+    initAudioAPI();
     if (audioRef.current) {
       audioRef.current.play().then(() => {
         setIsPlaying(true);
@@ -245,6 +296,11 @@ function App() {
 
   const toggleAudio = (trackSrc = null) => {
     if (!audioRef.current) return;
+    initAudioAPI();
+
+    if (audioContextRef.current?.state === "suspended") {
+      audioContextRef.current.resume();
+    }
 
     // If changing track
     if (trackSrc && trackSrc !== activeTrack) {
@@ -378,9 +434,11 @@ function App() {
               </div>
 
               {/* Content side */}
-              <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center relative overflow-y-auto">
+              <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col relative overflow-y-auto">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/5 rounded-full blur-3xl -ml-24 -mb-24 pointer-events-none" />
+
+                <div className="my-auto">
 
                 <motion.h2
                   initial={{ opacity: 0, x: 20 }}
@@ -416,7 +474,7 @@ function App() {
                         transition={{ duration: 0.4 }}
                         className="w-full px-2"
                       >
-                        <AudioVisualizer audioRef={audioRef} isPlaying={activeTrack === selectedCard.src && isPlaying} />
+                        <AudioVisualizer analyser={analyser} isPlaying={activeTrack === selectedCard.src && isPlaying} />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -447,6 +505,7 @@ function App() {
                   </div>
                 </motion.div>
               </div>
+            </div>
             </motion.div>
           </motion.div>
         )}
@@ -578,23 +637,16 @@ function App() {
                 <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-bg-dark/60 to-transparent h-[40%] top-auto z-10 pointer-events-none" />
 
                 {/* Text aligned at the top (justify-start) so it sits gorgeously on the "forehead" area */}
-                <div className="relative z-10 text-center px-4 w-full h-full flex flex-col items-center justify-start pt-[12vh] md:pt-[15vh]">
+                <div className="relative z-10 text-center px-4 w-full h-full flex flex-col items-center justify-end pb-[25vh] md:pb-[30vh]">
                   <motion.h1
                     initial={{ y: -50, opacity: 0, rotateX: 40 }}
                     animate={{ y: 0, opacity: 1, rotateX: 0 }}
                     transition={{ delay: 0.5, duration: 1.5, type: "spring", bounce: 0.4 }}
                     className="font-dancing text-6xl md:text-8xl lg:text-9xl text-primary mb-4 text-shadow leading-snug drop-shadow-[0_0_20px_rgba(255,182,193,0.9)]"
                   >
-                    Happy Birthday
+                    Happy Birthday <br />
+                    Komal 
                   </motion.h1>
-                  <motion.p
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 1.2, duration: 1 }}
-                    className="text-xl md:text-3xl lg:text-4xl text-shadow drop-shadow-md font-light text-white/90"
-                  >
-                    To the most wonderful girl in the world! 💖
-                  </motion.p>
 
                   {/* Scroll down indicator and beautiful cursive writing effect container */}
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-full pointer-events-none">
@@ -689,11 +741,13 @@ function App() {
                           </div>
                         )}
                         <div 
-                          className="w-full md:w-1/2 p-10 md:p-16 flex flex-col justify-center relative backdrop-blur-sm rounded-[40px]"
+                          className="w-full md:w-1/2 p-10 md:p-16 flex flex-col relative backdrop-blur-sm rounded-[40px]"
                           style={{ transform: 'translateZ(60px)', transformStyle: 'preserve-3d' }}
                         >
                           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" style={{ transform: 'translateZ(-10px)' }} />
                           <div className="absolute bottom-0 left-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none" style={{ transform: 'translateZ(-10px)' }} />
+
+                          <div className="my-auto">
 
                           <h2 
                             className="font-dancing text-5xl md:text-7xl text-secondary mb-8 leading-tight drop-shadow-lg relative z-10"
@@ -707,6 +761,7 @@ function App() {
                           >
                             {card.desc}
                           </p>
+                          </div>
                         </div>
                       </div>
                     </Tilt>
@@ -826,7 +881,7 @@ function App() {
                                   exit={{ opacity: 0, y: 10 }}
                                   transition={{ duration: 0.5 }}
                                 >
-                                  <AudioVisualizer audioRef={audioRef} isPlaying={isActiveAndPlaying} />
+                                  <AudioVisualizer analyser={analyser} isPlaying={isActiveAndPlaying} />
                                 </motion.div>
                               )}
                             </AnimatePresence>
